@@ -70,7 +70,7 @@ export class EventsCreate extends React.Component<IProps, IState> {
   }
 
   public validateTitle = async (value: any) => {
-    return this.store.validateTitle(value, 'v3_events')
+    return this.store.validateTitle(value, 'events')
   }
 
   public handleChange = (date: any) => {

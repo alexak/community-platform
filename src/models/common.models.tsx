@@ -1,4 +1,4 @@
-import { DBDoc as DBDocImport } from '../stores/databaseV2/types'
+import { DBDoc as DBDocImport, DBEndpoint } from '../stores/databaseV2/types'
 
 // re-export the database dbDoc to make it easier to import elsewhere
 export type DBDoc = DBDocImport
@@ -11,12 +11,9 @@ export type ISODateString = string
 // Another reminder, that user ids are saved in string format
 type userId = string
 
-export type IDBEndpoint =
-  | 'v3_howtos'
-  | 'v3_users'
-  | 'v3_tags'
-  | 'v3_events'
-  | 'v3_mappins'
+// Re-export of DBEndpoint
+// TODO - not really required so could refactor
+export type IDBEndpoint = DBEndpoint
 
 // Types for moderation status
 export type IModerationStatus =

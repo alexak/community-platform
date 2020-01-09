@@ -2,6 +2,7 @@ import { IDBEndpoint, DBDoc } from 'src/models/common.models'
 import Dexie from 'dexie'
 import { DBQueryOptions, DBQueryWhereOptions, AbstractDBClient } from '../types'
 import { DB_QUERY_DEFAULTS } from '../utils/db.utils'
+import { DB_PREFIX } from '../index'
 
 /**
  * Update the cache number either when making changes to db architecture
@@ -86,7 +87,7 @@ export class DexieClient implements AbstractDBClient {
    ***********************************************************************/
 
   private _init() {
-    this._dbInit(DB_CACHE_NUMBER, DEXIE_SCHEMA)
+    this._dbInit(DB_CACHE_NUMBER, DEXIE_SCHEMA_PREFIXED())
     // test open db, catch errors for upgrade version not defined or
     // idb not supported
     db.open().catch(async err => {
@@ -133,9 +134,20 @@ type IDexieSchema = { [key in IDBEndpoint]: string }
 const DEFAULT_SCHEMA = '_id,_modified'
 
 const DEXIE_SCHEMA: IDexieSchema = {
-  v3_events: `${DEFAULT_SCHEMA},slug`,
-  v3_howtos: `${DEFAULT_SCHEMA},slug`,
-  v3_mappins: DEFAULT_SCHEMA,
-  v3_tags: DEFAULT_SCHEMA,
-  v3_users: DEFAULT_SCHEMA,
+  events: `${DEFAULT_SCHEMA},slug`,
+  howtos: `${DEFAULT_SCHEMA},slug`,
+  mappins: DEFAULT_SCHEMA,
+  tags: DEFAULT_SCHEMA,
+  users: DEFAULT_SCHEMA,
+}
+
+// Schema as above, but with added prefix used for additional versioning
+const DEXIE_SCHEMA_PREFIXED = () => {
+  const schema = { ...DEXIE_SCHEMA }
+  Object.keys(DEXIE_SCHEMA).forEach(k => {
+    const prefixed = `${DB_PREFIX}${k}` as IDBEndpoint
+    schema[prefixed] = schema[k]
+    delete schema[k]
+  })
+  return schema
 }

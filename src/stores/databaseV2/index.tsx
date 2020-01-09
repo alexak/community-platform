@@ -13,6 +13,14 @@ import {
 } from './types'
 import { Observable, Observer } from 'rxjs'
 
+/**
+ * As platforms like firestore don't allow for easy db versioning use prefix
+ * which can be incremented to handle breaking updates
+ * @remark - can be set in environment for use in CI
+ * @remark - includes underscore simply for easier find/replace
+ */
+export const DB_PREFIX = process.env.DB_PREFIX || 'v3_'
+console.log('db prefix', DB_PREFIX)
 export class DatabaseV2 implements AbstractDatabase {
   private _clients: DBClients
   constructor(clients?: DBClients) {
@@ -47,7 +55,10 @@ export class DatabaseV2 implements AbstractDatabase {
 }
 
 class CollectionReference<T> {
-  constructor(private endpoint: DBEndpoint, private clients: DBClients) {}
+  endpoint: DBEndpoint
+  constructor(endpoint: DBEndpoint, private clients: DBClients) {
+    this.endpoint = `${DB_PREFIX}${endpoint}` as DBEndpoint
+  }
 
   /**
    * Provide a reference to a document to perform operations, such as getting or setting data
@@ -72,13 +83,10 @@ class CollectionReference<T> {
       async (obs: Observer<(T & DBDoc)[]>) => {
         // 1. Emit cached collection
         const cached = await cacheDB.getCollection<T>(endpoint)
-        console.debug('cached ' + endpoint, cached)
         obs.next(cached)
         if (cached.length === 0) {
           // 2. If no cache, populate using large query db
-          console.debug('getting server cache')
           const serverCache = await serverCacheDB.getCollection<T>(endpoint)
-          console.debug('serverCache', serverCache)
           await cacheDB.setBulkDocs(endpoint, serverCache)
           obs.next(serverCache)
         }
@@ -106,7 +114,7 @@ class CollectionReference<T> {
   /**
    * Set multiple docs in a collection in batch.
    * NOTE - to set an individual doc a reference to that doc should be generated instead
-   * i.e. `db.collection('v3_users').doc('myUsername').set(data)`
+   * i.e. `db.collection('users').doc('myUsername').set(data)`
    * @param docs - The collection of docs to set
    */
   async set(docs: any[]) {

@@ -118,9 +118,4 @@ export type ISODateString = string
  * indexing within the offline cache db
  */
 
-export type DBEndpoint =
-  | 'v3_howtos'
-  | 'v3_users'
-  | 'v3_tags'
-  | 'v3_events'
-  | 'v3_mappins'
+export type DBEndpoint = 'howtos' | 'users' | 'tags' | 'events' | 'mappins'

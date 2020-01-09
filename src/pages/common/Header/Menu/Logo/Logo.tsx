@@ -2,7 +2,6 @@ import React from 'react'
 import theme from 'src/themes/styled.theme'
 import { Link, Flex, Image } from 'rebass/styled-components'
 import styled from 'styled-components'
-
 import PPLogo from 'src/assets/images/precious-plastic-logo-official.svg'
 import Text from 'src/components/Text'
 import { VERSION } from 'src/config/config'

@@ -14,12 +14,13 @@ import { loginWithDHCredentials } from 'src/hacks/DaveHakkensNL.hacks'
 import { ModuleStore } from '../common/module.store'
 import { IConvertedFileMeta } from 'src/components/ImageInput/ImageInput'
 import { formatLowerNoSpecial } from 'src/utils/helpers'
+import { IDBEndpoint } from 'src/models/common.models'
 
 /*
 The user store listens to login events through the firebase api and exposes logged in user information via an observer.
 */
 
-const COLLECTION_NAME = 'v3_users'
+const COLLECTION_NAME: IDBEndpoint = 'users'
 
 export class UserStore extends ModuleStore {
   private authUnsubscribe: firebase.Unsubscribe
@@ -245,6 +246,7 @@ export class UserStore extends ModuleStore {
   private _listenToAuthStateChanges(checkEmailVerification = false) {
     this.authUnsubscribe = auth.onAuthStateChanged(authUser => {
       this.authUser = authUser
+      console.log('auth state changed', authUser)
       if (authUser) {
         this.userSignedIn(authUser)
         // send verification email if not verified and after first sign-up only
